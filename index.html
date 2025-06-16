@@ -1,0 +1,129 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finderbit - Soluções em Software</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #0A2E36 0%, #1E5F6B 50%, #2E8B57 100%);
+        }
+        .logo-bg {
+            background: #000;
+        }
+    </style>
+</head>
+<body class="font-sans text-white">
+    <!-- Navbar -->
+    <nav class="bg-black text-white py-4 sticky top-0 z-50 shadow-lg logo-bg">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-gradient-to-r from-teal-400 to-teal-700 rounded-full"></div>
+                <h1 class="text-2xl font-bold tracking-tight">Finderbit</h1>
+            </div>
+            <ul class="flex space-x-6">
+                <li><a href="#home" class="hover:text-teal-300 transition">Início</a></li>
+                <li><a href="#about" class="hover:text-teal-300 transition">Sobre</a></li>
+                <li><a href="#services" class="hover:text-teal-300 transition">Serviços</a></li>
+                <li><a href="#contact" class="hover:text-teal-300 transition">Contato</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="gradient-bg py-24 text-center">
+        <div class="container mx-auto px-4">
+            <h2 class="text-5xl md:text-6xl font-extrabold mb-4">Finderbit</h2>
+            <p class="text-xl md:text-2xl mb-6 font-light">Bit a Bit, Solução por Solução</p>
+            <a href="#contact" class="bg-teal-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-teal-600 transition">Comece Agora</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-gray-900">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Sobre a Finderbit</h2>
+            <p class="text-lg text-gray-300 max-w-2xl mx-auto">Somos uma equipe dedicada a criar soluções de software inovadoras, bit a bit. Desde 2023, entregamos projetos personalizados com as melhores tecnologias, transformando ideias em resultados reais.</p>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-16 bg-black">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8 text-teal-400">Nossos Serviços</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-700 transition">
+                    <h3 class="text-xl font-semibold mb-2">Desenvolvimento Web</h3>
+                    <p class="text-gray-400">Sistemas robustos e escaláveis com foco em performance.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-700 transition">
+                    <h3 class="text-xl font-semibold mb-2">Consultoria</h3>
+                    <p class="text-gray-400">Estratégias ágeis para otimizar seus processos.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-700 transition">
+                    <h3 class="text-xl font-semibold mb-2">Suporte Técnico</h3>
+                    <p class="text-gray-400">Manutenção contínua e soluções rápidas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 gradient-bg">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Entre em Contato</h2>
+            <form class="max-w-lg mx-auto space-y-4">
+                <input type="text" placeholder="Nome" class="w-full p-3 rounded-lg bg-gray-800 border border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600">
+                <input type="email" placeholder="E-mail" class="w-full p-3 rounded-lg bg-gray-800 border border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600">
+                <textarea placeholder="Mensagem" rows="4" class="w-full p-3 rounded-lg bg-gray-800 border border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600"></textarea>
+                <button type="submit" class="w-full bg-teal-700 p-3 rounded-lg font-semibold hover:bg-teal-600 transition">Enviar</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-6 text-center logo-bg">
+        <p class="text-gray-400">© 2025 Finderbit. Bit a Bit, Solução por Solução.</p>
+    </footer>
+</body>
+</html>
